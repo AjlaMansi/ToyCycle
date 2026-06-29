@@ -10,10 +10,11 @@ router.post('/', upload.single('image'), async (req, res) => {
   try {
     const model = genAI.getGenerativeModel({ model: 'gemini-3.5-flash' });
 
-    const lang = req.body.lang || 'sq';
-    const langInstruction = lang === 'sq' 
-      ? 'Respond entirely in Albanian (Shqip).' 
-      : 'Respond in English.';
+    const lang = req.body.lang || "sq";
+    const langInstruction =
+      lang === "en"
+        ? "Respond in English."
+        : "Respond entirely in Albanian (Shqip).";
 
     const imageData = {
       inlineData: {
