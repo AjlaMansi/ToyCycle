@@ -15,13 +15,17 @@ router.post('/', upload.single('image'), async (req, res) => {
         mimeType: req.file.mimetype
       }
     };
-    const prompt = `Identify this toy. Respond in JSON only, no markdown:
+    const prompt = `Identify this toy and provide a comprehensive parent guide. Respond in JSON only, no markdown:
 {
   "name": "toy name",
   "brand": "brand or unknown",
-  "category": "category (e.g. puzzle, doll, vehicle)",
-  "age_range": "e.g. 3-6",
-  "description": "1 sentence description"
+  "category": "category",
+  "age_range": "recommended age range",
+  "description": "brief description",
+  "benefits": ["developmental benefit 1", "benefit 2", "benefit 3"],
+  "risks": ["potential risk or harm 1", "risk 2"],
+  "skills_developed": ["skill 1", "skill 2"],
+  "supervision_required": "yes/no and why"
 }`;
     const result = await model.generateContent([prompt, imageData]);
     const text = result.response.text();
