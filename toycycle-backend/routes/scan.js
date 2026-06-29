@@ -28,6 +28,7 @@ router.post('/', upload.single('image'), async (req, res) => {
     const json = JSON.parse(text);
     res.json({ success: true, data: json });
   } catch (err) {
+    console.error('SCAN ERROR:', err);
     res.status(500).json({ success: false, error: err.message });
   }
 });
