@@ -25,6 +25,7 @@ const resources = {
       toy_condition: "Gjendja (e re, e mirë, ...)",
       donate: "Dhuratë",
       request_toy: "Kërkoj",
+
       exchange: "Këmbim",
       community: "Komuniteti",
       no_posts: "Nuk ka postime ende.",
@@ -39,7 +40,13 @@ const resources = {
       logout: "Dilni",
       scan: "Skano",
       photo_toy: "Fotografo lodrën",
+      scan_intro_title: "Skanoni lodrën tuaj",
+      scan_intro_text:
+        "Bëni një foto dhe AI do të identifikojë lodrën, moshën e përshtatshme, rreziqet dhe përfitimet e të nxënit.",
       scan_ai: "Skano me AI",
+      scan_title: "Skano një lodër",
+      scan_desc:
+        "Përdor kamerën për të skanuar lodra ose kode. Identifiko lodrat shpejt, shiko detajet ose shtoji në koleksionin tënd.",
       benefits: "Përfitimet",
       risks: "Rreziqet",
       skills: "Aftësitë e zhvilluara",
@@ -55,6 +62,12 @@ const resources = {
       register: "Register",
       email: "Email",
       password: "Password",
+      scan_intro_title: "Scan your toy",
+      scan_intro_text:
+        "Take a photo and let AI identify the toy, explain age suitability, safety risks, and learning benefits.",
+      scan_title: "Scan a Toy",
+      scan_desc:
+        "Use your camera to scan toy codes or items. Quickly identify toys, view details, or add them to your collection in seconds.",
       full_name: "Full name",
       city: "City",
       edit_profile: "Edit profile",

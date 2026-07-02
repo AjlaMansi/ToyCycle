@@ -16,6 +16,9 @@ import { supabase } from "../../src/services/supabase";
 import { useTranslation } from "react-i18next";
 import { showImageWarning } from "../../src/components/safetyWarning";
 import { pickAndUploadImage } from "../../src/services/uploadMedia";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
+import { ScrollView } from "react-native";
 
 type Toy = {
   id: string;
@@ -108,155 +111,165 @@ export default function ToysScreen() {
   };
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t("toys")}</Text>
-        <View style={styles.headerRight}>
-          <TouchableOpacity
-            onPress={() =>
-              i18n.changeLanguage(i18n.language === "sq" ? "en" : "sq")
-            }
-          >
-            <Text style={styles.lang}>
-              {i18n.language === "sq" ? "EN" : "SQ"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.addBtn}
-            onPress={() => setShowModal(true)}
-          >
-            <Text style={styles.addBtnText}>+</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <FlatList
-        data={toys}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
-          const isExpanded = expandedToy === item.id;
-          return (
-            <TouchableOpacity onPress={() => toggleToyExpand(item.id)}>
-              <View style={styles.card}>
-                <View style={styles.cardHeader}>
-                  <Text style={styles.cardTitle}>{item.name}</Text>
-                  <View
-                    style={[
-                      styles.badge,
-                      { backgroundColor: statusColor[item.status] },
-                    ]}
-                  >
-                    <Text style={styles.badgeText}>
-                      {statusLabel[item.status]}
-                    </Text>
-                  </View>
-                </View>
-                <Text style={styles.cardSub}>
-                  {item.profiles?.full_name || "Anonymous"}
+    <LinearGradient
+      colors={["#f6fff7", "#e8f5e9", "#ffffff"]}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{t("toys")}</Text>
+            <View style={styles.headerRight}>
+              <TouchableOpacity
+                onPress={() =>
+                  i18n.changeLanguage(i18n.language === "sq" ? "en" : "sq")
+                }
+              >
+                <Text style={styles.lang}>
+                  {i18n.language === "sq" ? "EN" : "SQ"}
                 </Text>
-                {item.brand || item.category ? (
-                  <Text>
-                    {item.brand}
-                    {item.category ? ` · ${item.category}` : ""}
-                  </Text>
-                ) : null}
-                {item.condition ? (
-                  <Text style={styles.condition}>{item.condition}</Text>
-                ) : null}
-                {item.image_url && isExpanded && (
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.addBtn}
+                onPress={() => setShowModal(true)}
+              >
+                <Text style={styles.addBtnText}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          <FlatList
+            data={toys}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => {
+              const isExpanded = expandedToy === item.id;
+              return (
+                <TouchableOpacity onPress={() => toggleToyExpand(item.id)}>
+                  <View style={styles.card}>
+                    <View style={styles.cardHeader}>
+                      <Text style={styles.cardTitle}>{item.name}</Text>
+                      <View
+                        style={[
+                          styles.badge,
+                          { backgroundColor: statusColor[item.status] },
+                        ]}
+                      >
+                        <Text style={styles.badgeText}>
+                          {statusLabel[item.status]}
+                        </Text>
+                      </View>
+                    </View>
+                    <Text style={styles.cardSub}>
+                      {item.profiles?.full_name || "Anonymous"}
+                    </Text>
+                    {item.brand || item.category ? (
+                      <Text>
+                        {item.brand}
+                        {item.category ? ` · ${item.category}` : ""}
+                      </Text>
+                    ) : null}
+                    {item.condition ? (
+                      <Text style={styles.condition}>{item.condition}</Text>
+                    ) : null}
+                    {item.image_url && isExpanded && (
+                      <Image
+                        source={{ uri: item.image_url }}
+                        style={styles.toyImage}
+                        resizeMode="contain"
+                      />
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+            ListEmptyComponent={
+              <Text style={styles.empty}>{t("no_toys")}</Text>
+            }
+          />
+
+          <Modal visible={showModal} animationType="slide" transparent>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : undefined}
+              style={styles.modalOverlay}
+            >
+              <View style={styles.modal}>
+                <Text style={styles.modalTitle}>{t("add_toy")}</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("toy_name")}
+                  value={name}
+                  onChangeText={setName}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("toy_brand")}
+                  value={brand}
+                  onChangeText={setBrand}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("toy_category")}
+                  value={category}
+                  onChangeText={setCategory}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("toy_condition")}
+                  value={condition}
+                  onChangeText={setCondition}
+                />
+                <TouchableOpacity
+                  style={[styles.btn, { backgroundColor: "#1565c0" }]}
+                  onPress={() =>
+                    showImageWarning(async () => {
+                      const url = await pickAndUploadImage();
+                      if (url) setImageUrl(url);
+                    })
+                  }
+                >
+                  <Text style={styles.btnText}>📸 Add Toy Image</Text>
+                </TouchableOpacity>
+                {imageUrl && (
                   <Image
-                    source={{ uri: item.image_url }}
+                    source={{ uri: imageUrl }}
                     style={styles.toyImage}
-                    resizeMode="contain"
+                    resizeMode="cover"
                   />
                 )}
-              </View>
-            </TouchableOpacity>
-          );
-        }}
-        ListEmptyComponent={<Text style={styles.empty}>{t("no_toys")}</Text>}
-      />
-
-      <Modal visible={showModal} animationType="slide" transparent>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.modalOverlay}
-        >
-          <View style={styles.modal}>
-            <Text style={styles.modalTitle}>{t("add_toy")}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder={t("toy_name")}
-              value={name}
-              onChangeText={setName}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder={t("toy_brand")}
-              value={brand}
-              onChangeText={setBrand}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder={t("toy_category")}
-              value={category}
-              onChangeText={setCategory}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder={t("toy_condition")}
-              value={condition}
-              onChangeText={setCondition}
-            />
-            <TouchableOpacity
-              style={[styles.btn, { backgroundColor: "#1565c0" }]}
-              onPress={() =>
-                showImageWarning(async () => {
-                  const url = await pickAndUploadImage();
-                  if (url) setImageUrl(url);
-                })
-              }
-            >
-              <Text style={styles.btnText}>📸 Add Toy Image</Text>
-            </TouchableOpacity>
-            {imageUrl && (
-              <Image
-                source={{ uri: imageUrl }}
-                style={styles.toyImage}
-                resizeMode="cover"
-              />
-            )}
-            <View style={styles.statusRow}>
-              {(["donate", "request", "exchange"] as const).map((s) => (
-                <TouchableOpacity
-                  key={s}
-                  style={[
-                    styles.statusBtn,
-                    { backgroundColor: status === s ? statusColor[s] : "#eee" },
-                  ]}
-                  onPress={() => setStatus(s)}
-                >
-                  <Text
-                    style={{
-                      color: status === s ? "#fff" : "#555",
-                      fontSize: 12,
-                    }}
-                  >
-                    {statusLabel[s]}
-                  </Text>
+                <View style={styles.statusRow}>
+                  {(["donate", "request", "exchange"] as const).map((s) => (
+                    <TouchableOpacity
+                      key={s}
+                      style={[
+                        styles.statusBtn,
+                        {
+                          backgroundColor:
+                            status === s ? statusColor[s] : "#eee",
+                        },
+                      ]}
+                      onPress={() => setStatus(s)}
+                    >
+                      <Text
+                        style={{
+                          color: status === s ? "#fff" : "#555",
+                          fontSize: 12,
+                        }}
+                      >
+                        {statusLabel[s]}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+                <TouchableOpacity style={styles.btn} onPress={addToy}>
+                  <Text style={styles.btnText}>{t("submit")}</Text>
                 </TouchableOpacity>
-              ))}
-            </View>
-            <TouchableOpacity style={styles.btn} onPress={addToy}>
-              <Text style={styles.btnText}>{t("submit")}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowModal(false)}>
-              <Text style={styles.cancelText}>{t("cancel")}</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
-    </View>
+                <TouchableOpacity onPress={() => setShowModal(false)}>
+                  <Text style={styles.cancelText}>{t("cancel")}</Text>
+                </TouchableOpacity>
+              </View>
+            </KeyboardAvoidingView>
+          </Modal>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
@@ -278,6 +291,10 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     justifyContent: "center",
     alignItems: "center",
+  },
+  content: {
+    padding: 16,
+    paddingBottom: 100,
   },
   addBtnText: { color: "#fff", fontSize: 24, lineHeight: 28 },
   card: {

@@ -10,6 +10,8 @@ import {
 import { router } from "expo-router";
 import { supabase } from "../../src/services/supabase";
 import { useTranslation } from "react-i18next";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
@@ -62,71 +64,81 @@ export default function ProfileScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t("profile")}</Text>
-        <TouchableOpacity
-          onPress={() =>
-            i18n.changeLanguage(i18n.language === "sq" ? "en" : "sq")
-          }
-        >
-          <Text style={styles.lang}>
-            {i18n.language === "sq" ? "EN" : "SQ"}
-          </Text>
-        </TouchableOpacity>
-      </View>
-
-      <View style={styles.card}>
-        <Text style={styles.info}>📧 {email}</Text>
-        {editing ? (
-          <>
-            <TextInput
-              style={styles.input}
-              placeholder={t("full_name")}
-              value={fullName}
-              onChangeText={setFullName}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder={t("city")}
-              value={city}
-              onChangeText={setCity}
-            />
-            <TextInput
-              style={styles.input}
-              placeholder={t("phone")}
-              value={phone}
-              onChangeText={setPhone}
-              keyboardType="phone-pad"
-            />
-            <TouchableOpacity style={styles.btn} onPress={saveProfile}>
-              <Text style={styles.btnText}>{t("submit")}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setEditing(false)}>
-              <Text style={styles.cancel}>{t("cancel")}</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <Text style={styles.name}>{fullName || "—"}</Text>
-            {city ? <Text style={styles.info}>📍 {city}</Text> : null}
-            {phone ? <Text style={styles.info}>📞 {phone}</Text> : null}
+    <LinearGradient
+      colors={["#f6fff7", "#e8f5e9", "#ffffff"]}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{t("profile")}</Text>
             <TouchableOpacity
-              style={[styles.btn, { backgroundColor: "#1565c0", marginTop: 8 }]}
-              onPress={() => setEditing(true)}
+              onPress={() =>
+                i18n.changeLanguage(i18n.language === "sq" ? "en" : "sq")
+              }
             >
-              <Text style={styles.btnText}>
-                ✏️ {t("edit_profile") || "Edit"}
+              <Text style={styles.lang}>
+                {i18n.language === "sq" ? "EN" : "SQ"}
               </Text>
             </TouchableOpacity>
-          </>
-        )}
-      </View>
+          </View>
 
-      <TouchableOpacity style={styles.btn} onPress={handleLogout}>
-        <Text style={styles.btnText}>{t("logout")}</Text>
-      </TouchableOpacity>
-    </View>
+          <View style={styles.card}>
+            <Text style={styles.info}>📧 {email}</Text>
+            {editing ? (
+              <>
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("full_name")}
+                  value={fullName}
+                  onChangeText={setFullName}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("city")}
+                  value={city}
+                  onChangeText={setCity}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("phone")}
+                  value={phone}
+                  onChangeText={setPhone}
+                  keyboardType="phone-pad"
+                />
+                <TouchableOpacity style={styles.btn} onPress={saveProfile}>
+                  <Text style={styles.btnText}>{t("submit")}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setEditing(false)}>
+                  <Text style={styles.cancel}>{t("cancel")}</Text>
+                </TouchableOpacity>
+              </>
+            ) : (
+              <>
+                <Text style={styles.name}>{fullName || "—"}</Text>
+                {city ? <Text style={styles.info}>📍 {city}</Text> : null}
+                {phone ? <Text style={styles.info}>📞 {phone}</Text> : null}
+                <TouchableOpacity
+                  style={[
+                    styles.btn,
+                    { backgroundColor: "#1565c0", marginTop: 8 },
+                  ]}
+                  onPress={() => setEditing(true)}
+                >
+                  <Text style={styles.btnText}>
+                    ✏️ {t("edit_profile") || "Edit"}
+                  </Text>
+                </TouchableOpacity>
+              </>
+            )}
+          </View>
+
+          <TouchableOpacity style={styles.btn} onPress={handleLogout}>
+            <Text style={styles.btnText}>{t("logout")}</Text>
+          </TouchableOpacity>
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 

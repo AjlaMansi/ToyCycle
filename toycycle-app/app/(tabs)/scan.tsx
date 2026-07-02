@@ -12,6 +12,8 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import axios from "axios";
 import { useTranslation } from "react-i18next";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 
 const BACKEND_URL = "https://toycycle-production.up.railway.app";
 
@@ -48,34 +50,78 @@ export default function ScanScreen() {
   }
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
-      <Text style={styles.title}>{t('scan')}</Text>
-      <TouchableOpacity style={styles.btn} onPress={pickImage}>
-        <Text style={styles.btnText}>📷 Fotografo lodrën</Text>
-      </TouchableOpacity>
-      {image && <Image source={{ uri: image }} style={styles.image}/>}
-      {image && (
-        <TouchableOpacity style={styles.btn} onPress={scanToy}>
-          <Text style={styles.btnText}>🔍 Skano me AI</Text>
-        </TouchableOpacity>
-      )}
-      {loading && <ActivityIndicator size="large" color="#2e7d32"/>}
-      {result && (
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>{result.name}</Text>
-          <Text>{result.brand} · {result.category}</Text>
-          <Text>{t('age')}: {result.age_range}</Text>
-          <Text style={{marginTop:8}}>{result.description}</Text>
-          {result.benefits && <Text style={{marginTop:8, fontWeight:'bold'}}>✅ {t('benefits')}:</Text>}
-          {result.benefits?.map((b: string, i: number) => <Text key={i}>• {b}</Text>)}
-          {result.risks && <Text style={{marginTop:8, fontWeight:'bold'}}>⚠️ {t('risks')}:</Text>}
-          {result.risks?.map((r: string, i: number) => <Text key={i}>• {r}</Text>)}
-          {result.skills_developed && <Text style={{marginTop:8, fontWeight:'bold'}}>🧠 {t('skills')}:</Text>}
-          {result.skills_developed?.map((s: string, i: number) => <Text key={i}>• {s}</Text>)}
-          {result.supervision_required && <Text style={{marginTop:8}}>👁️ {t('supervision')}: {result.supervision_required}</Text>}
-        </View>
-      )}
-    </ScrollView>
+    <LinearGradient
+      colors={["#f6fff7", "#e8f5e9", "#ffffff"]}
+      style={{ flex: 1 }}>
+      <SafeAreaView style={{ flex: 1 }}>
+        <ScrollView contentContainerStyle={styles.content}>
+          <Image
+            source={{
+              uri: "https://images.unsplash.com/photo-1603354350317-6f7aaa5911c5",
+            }}
+            style={styles.headerImage}
+          />
+          <Text style={styles.title}>{t("scan")}</Text>
+          <View style={styles.introCard}>
+            <Text style={styles.introTitle}>{t("scan_intro_title")}</Text>
+            <Text style={styles.introText}>{t("scan_intro_text")}</Text>
+          </View>
+          <View style={styles.buttonContainer}>
+            <TouchableOpacity style={styles.btn} onPress={pickImage}>
+              <Text style={styles.btnText}>📷 Fotografo lodrën</Text>
+            </TouchableOpacity>
+            {image && <Image source={{ uri: image }} style={styles.image} />}
+            {image && (
+              <TouchableOpacity style={styles.btn} onPress={scanToy}>
+                <Text style={styles.btnText}>🔍 Skano me AI</Text>
+              </TouchableOpacity>
+            )}
+          </View>
+          {loading && <ActivityIndicator size="large" color="#2e7d32" />}
+          {result && (
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>{result.name}</Text>
+              <Text>
+                {result.brand} · {result.category}
+              </Text>
+              <Text>
+                {t("age")}: {result.age_range}
+              </Text>
+              <Text style={{ marginTop: 8 }}>{result.description}</Text>
+              {result.benefits && (
+                <Text style={{ marginTop: 8, fontWeight: "bold" }}>
+                  ✅ {t("benefits")}:
+                </Text>
+              )}
+              {result.benefits?.map((b: string, i: number) => (
+                <Text key={i}>• {b}</Text>
+              ))}
+              {result.risks && (
+                <Text style={{ marginTop: 8, fontWeight: "bold" }}>
+                  ⚠️ {t("risks")}:
+                </Text>
+              )}
+              {result.risks?.map((r: string, i: number) => (
+                <Text key={i}>• {r}</Text>
+              ))}
+              {result.skills_developed && (
+                <Text style={{ marginTop: 8, fontWeight: "bold" }}>
+                  🧠 {t("skills")}:
+                </Text>
+              )}
+              {result.skills_developed?.map((s: string, i: number) => (
+                <Text key={i}>• {s}</Text>
+              ))}
+              {result.supervision_required && (
+                <Text style={{ marginTop: 8 }}>
+                  👁️ {t("supervision")}: {result.supervision_required}
+                </Text>
+              )}
+            </View>
+          )}
+        </ScrollView>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
@@ -83,9 +129,53 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
   content: { padding: 16, paddingBottom: 60 },
   title: { fontSize: 22, fontWeight: "bold", marginBottom: 16 },
-  btn: { backgroundColor: "#2e7d32", padding: 14, borderRadius: 8, marginBottom: 12 },
+  btn: {
+    backgroundColor: "#2e7d32",
+    padding: 14,
+    borderRadius: 8,
+    marginBottom: 12,
+  },
+  headerImage: {
+    width: "100%",
+    height: 160,
+    borderRadius: 12,
+    marginBottom: 12,
+  },
+
+  buttonContainer: {
+    alignItems: "center",
+    marginBottom: 12,
+  },
+
+  introCard: {
+    backgroundColor: "#f6f8f6",
+    padding: 14,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: "#eee",
+  },
+
+  introTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    marginBottom: 6,
+    color: "#2e7d32",
+  },
+
+  introText: {
+    fontSize: 13,
+    color: "#555",
+    lineHeight: 18,
+  },
   btnText: { color: "#fff", textAlign: "center", fontWeight: "bold" },
   image: { width: "100%", height: 200, borderRadius: 8, marginBottom: 12 },
-  card: { borderWidth: 1, borderColor: "#eee", borderRadius: 8, padding: 12, marginBottom: 40 },
+  card: {
+    borderWidth: 1,
+    borderColor: "#eee",
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 40,
+  },
   cardTitle: { fontWeight: "bold", fontSize: 18, marginBottom: 4 },
 });

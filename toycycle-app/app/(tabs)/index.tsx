@@ -16,13 +16,15 @@ import { supabase } from "../../src/services/supabase";
 import { useTranslation } from "react-i18next";
 import { showImageWarning } from "../../src/components/safetyWarning";
 import { pickAndUploadImage } from "../../src/services/uploadMedia";
+import { SafeAreaView } from "react-native-safe-area-context";
+import { LinearGradient } from "expo-linear-gradient";
 
 type Post = {
   id: string;
   title: string;
   body: string;
   created_at: string;
-  image_url?: string | null;   // 👈 ADD THIS
+  image_url?: string | null; // 👈 ADD THIS
   profiles: { full_name: string } | null;
   post_likes: { id: string; user_id: string }[];
 };
@@ -128,137 +130,144 @@ export default function HomeScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.title}>{t("community")}</Text>
-        <View style={styles.headerRight}>
-          <TouchableOpacity
-            onPress={() =>
-              i18n.changeLanguage(i18n.language === "sq" ? "en" : "sq")
-            }
-          >
-            <Text style={styles.lang}>
-              {i18n.language === "sq" ? "EN" : "SQ"}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.addBtn}
-            onPress={() => setShowModal(true)}
-          >
-            <Text style={styles.addBtnText}>+</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+    <LinearGradient
+      colors={["#f6fff7", "#e8f5e9", "#ffffff"]}
+      style={{ flex: 1 }}
+    >
+      <SafeAreaView style={{ flex: 1 }}>
+        <View style={styles.container}>
+          <View style={styles.header}>
+            <Text style={styles.title}>{t("community")}</Text>
+            <View style={styles.headerRight}>
+              <TouchableOpacity
+                onPress={() =>
+                  i18n.changeLanguage(i18n.language === "sq" ? "en" : "sq")
+                }
+              >
+                <Text style={styles.lang}>
+                  {i18n.language === "sq" ? "EN" : "SQ"}
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.addBtn}
+                onPress={() => setShowModal(true)}
+              >
+                <Text style={styles.addBtnText}>+</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
 
-      <FlatList
-        data={posts}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => {
-          
-          const liked = item.post_likes.some((l) => l.user_id === userId);
-          const isExpanded = expandedPost === item.id;
-          
-          return (
-          <TouchableOpacity onPress={() => toggleExpand(item.id)}>
-            <View style={styles.card}>
-              <Text style={styles.cardTitle}>{item.title}</Text>
-              <Text style={styles.cardSub}>
-                {item.profiles?.full_name || "Anonymous"}
-              </Text>
-              <Text style={styles.cardBody}>{item.body}</Text>
-              {item.image_url && isExpanded && (
-                <Image
-                  source={{ uri: item.image_url }}
-                  style={styles.postImage}
-                />
-              )}
-              <View style={styles.cardActions}>
-                <TouchableOpacity onPress={() => toggleLike(item)}>
-                  <Text style={{ color: liked ? "#e53935" : "#aaa" }}>
-                    {liked ? "❤️" : "🤍"} {item.post_likes.length}
-                  </Text>
-                </TouchableOpacity>
+          <FlatList
+            data={posts}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => {
+              const liked = item.post_likes.some((l) => l.user_id === userId);
+              const isExpanded = expandedPost === item.id;
+
+              return (
                 <TouchableOpacity onPress={() => toggleExpand(item.id)}>
-                  <Text style={styles.commentToggle}>
-                    💬 {t("comments")} {isExpanded ? "▲" : "▼"}
-                  </Text>
+                  <View style={styles.card}>
+                    <Text style={styles.cardTitle}>{item.title}</Text>
+                    <Text style={styles.cardSub}>
+                      {item.profiles?.full_name || "Anonymous"}
+                    </Text>
+                    <Text style={styles.cardBody}>{item.body}</Text>
+                    {item.image_url && isExpanded && (
+                      <Image
+                        source={{ uri: item.image_url }}
+                        style={styles.postImage}
+                      />
+                    )}
+                    <View style={styles.cardActions}>
+                      <TouchableOpacity onPress={() => toggleLike(item)}>
+                        <Text style={{ color: liked ? "#e53935" : "#aaa" }}>
+                          {liked ? "❤️" : "🤍"} {item.post_likes.length}
+                        </Text>
+                      </TouchableOpacity>
+                      <TouchableOpacity onPress={() => toggleExpand(item.id)}>
+                        <Text style={styles.commentToggle}>
+                          💬 {t("comments")} {isExpanded ? "▲" : "▼"}
+                        </Text>
+                      </TouchableOpacity>
+                    </View>
+                    {isExpanded && (
+                      <View style={styles.commentsSection}>
+                        {(comments[item.id] || []).map((c) => (
+                          <View key={c.id} style={styles.commentRow}>
+                            <Text style={styles.commentAuthor}>
+                              {c.profiles?.full_name || "Anonymous"}:{" "}
+                            </Text>
+                            <Text style={{ flex: 1 }}>{c.body}</Text>
+                          </View>
+                        ))}
+                        <View style={styles.commentInput}>
+                          <TextInput
+                            style={styles.commentField}
+                            placeholder={t("add_comment")}
+                            value={newComment}
+                            onChangeText={setNewComment}
+                          />
+                          <TouchableOpacity
+                            onPress={() => addComment(item.id)}
+                            style={styles.sendBtn}
+                          >
+                            <Text style={{ color: "#fff" }}>→</Text>
+                          </TouchableOpacity>
+                        </View>
+                      </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            }}
+            ListEmptyComponent={
+              <Text style={styles.empty}>{t("no_posts")}</Text>
+            }
+          />
+
+          <Modal visible={showModal} animationType="slide" transparent>
+            <KeyboardAvoidingView
+              behavior={Platform.OS === "ios" ? "padding" : undefined}
+              style={styles.modalOverlay}
+            >
+              <View style={styles.modal}>
+                <Text style={styles.modalTitle}>{t("create_post")}</Text>
+                <TextInput
+                  style={styles.input}
+                  placeholder={t("post_title")}
+                  value={title}
+                  onChangeText={setTitle}
+                />
+                <TextInput
+                  style={[styles.input, { height: 100 }]}
+                  placeholder={t("post_body")}
+                  value={body}
+                  onChangeText={setBody}
+                  multiline
+                />
+                <TouchableOpacity
+                  style={[styles.btn, { backgroundColor: "#1565c0" }]}
+                  onPress={() =>
+                    showImageWarning(async () => {
+                      const url = await pickAndUploadImage();
+                      if (url) setImageUrl(url);
+                    })
+                  }
+                >
+                  <Text style={styles.btnText}>📸 Add Image</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.btn} onPress={createPost}>
+                  <Text style={styles.btnText}>{t("submit")}</Text>
+                </TouchableOpacity>
+                <TouchableOpacity onPress={() => setShowModal(false)}>
+                  <Text style={styles.cancelText}>{t("cancel")}</Text>
                 </TouchableOpacity>
               </View>
-              {isExpanded && (
-                <View style={styles.commentsSection}>
-                  {(comments[item.id] || []).map((c) => (
-                    <View key={c.id} style={styles.commentRow}>
-                      <Text style={styles.commentAuthor}>
-                        {c.profiles?.full_name || "Anonymous"}:{" "}
-                      </Text>
-                      <Text style={{ flex: 1 }}>{c.body}</Text>
-                    </View>
-                  ))}
-                  <View style={styles.commentInput}>
-                    <TextInput
-                      style={styles.commentField}
-                      placeholder={t("add_comment")}
-                      value={newComment}
-                      onChangeText={setNewComment}
-                    />
-                    <TouchableOpacity
-                      onPress={() => addComment(item.id)}
-                      style={styles.sendBtn}
-                    >
-                      <Text style={{ color: "#fff" }}>→</Text>
-                    </TouchableOpacity>
-                  </View>
-                </View>
-              )}
-            </View>
-          </TouchableOpacity>
-          );
-        }}
-        ListEmptyComponent={<Text style={styles.empty}>{t("no_posts")}</Text>}
-      />
-
-      <Modal visible={showModal} animationType="slide" transparent>
-        <KeyboardAvoidingView
-          behavior={Platform.OS === "ios" ? "padding" : undefined}
-          style={styles.modalOverlay}
-        >
-          <View style={styles.modal}>
-            
-            <Text style={styles.modalTitle}>{t("create_post")}</Text>
-            <TextInput
-              style={styles.input}
-              placeholder={t("post_title")}
-              value={title}
-              onChangeText={setTitle}
-            />
-            <TextInput
-              style={[styles.input, { height: 100 }]}
-              placeholder={t("post_body")}
-              value={body}
-              onChangeText={setBody}
-              multiline
-            />
-            <TouchableOpacity
-              style={[styles.btn, { backgroundColor: "#1565c0" }]}
-              onPress={() =>
-                showImageWarning(async () => {
-                  const url = await pickAndUploadImage();
-                  if (url) setImageUrl(url);
-                })
-              }
-            >
-              <Text style={styles.btnText}>📸 Add Image</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.btn} onPress={createPost}>
-              <Text style={styles.btnText}>{t("submit")}</Text>
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => setShowModal(false)}>
-              <Text style={styles.cancelText}>{t("cancel")}</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
-    </View>
+            </KeyboardAvoidingView>
+          </Modal>
+        </View>
+      </SafeAreaView>
+    </LinearGradient>
   );
 }
 
